@@ -130,7 +130,7 @@ export const StudentLayout = () => {
 
       {/* Main content */}
       <main className="flex-1 min-w-0 pt-14 lg:pt-0">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-10 py-8 lg:py-10">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-10 py-8 lg:py-10">
           <Outlet />
         </div>
       </main>
