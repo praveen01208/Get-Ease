@@ -319,6 +319,27 @@ export const CoursePlayer = () => {
 
             {activeTab === 'notes' && (
               <div className="max-w-3xl">
+                {lessonResources.length > 0 && (
+                  <div className="mb-8">
+                    <h3 className="text-sm font-bold text-primary mb-1">Instructor Notes</h3>
+                    <p className="text-xs text-secondary mb-3">Notes and handouts your instructor attached to this lesson.</p>
+                    <div className="space-y-2">
+                      {lessonResources.map((r: any) => (
+                        <a
+                          key={r.id}
+                          href={r.url || '#'}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="glass-card p-3.5 flex items-center gap-3 hover:border-white/10 transition-colors"
+                        >
+                          <FileText className="w-4 h-4 text-primary/70 shrink-0" />
+                          <span className="text-sm font-medium text-primary truncate">{r.title}</span>
+                          <span className="ml-auto text-xs text-secondary uppercase shrink-0">{r.type}</span>
+                        </a>
+                      ))}
+                    </div>
+                  </div>
+                )}
                 <h3 className="text-lg font-bold text-primary mb-1">My Notes</h3>
                 <p className="text-xs text-secondary mb-4">
                   Notes save automatically and stay attached to this lesson.

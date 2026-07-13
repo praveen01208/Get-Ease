@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Plus, Trash2, GripVertical, ChevronDown, ChevronUp, FileText } from 'lucide-react';
+import { Plus, Trash2, GripVertical, ChevronDown, ChevronUp, FileText, Layers, Loader2 } from 'lucide-react';
 import { adminApi } from '@/lib/adminApi';
 import { VideoUploader } from '@/components/admin/upload/VideoUploader';
 import { FileUploader } from '@/components/admin/upload/FileUploader';
@@ -12,6 +12,8 @@ export const LessonsStep: React.FC<Props> = ({ course }) => {
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [adding, setAdding] = useState(false);
   const [newTitle, setNewTitle] = useState('');
+  const [episodeCount, setEpisodeCount] = useState(5);
+  const [bulkCreating, setBulkCreating] = useState(false);
 
   useEffect(() => {
     if (course?.id) {
@@ -32,6 +34,26 @@ export const LessonsStep: React.FC<Props> = ({ course }) => {
       setNewTitle('');
       setExpandedId(res.data.data.id);
     } finally { setAdding(false); }
+  };
+
+  const createEpisodes = async () => {
+    if (episodeCount < 1) return;
+    setBulkCreating(true);
+    try {
+      const created: any[] = [];
+      for (let i = 0; i < episodeCount; i++) {
+        const res = await adminApi.createLesson(course.id, {
+          title: `Episode ${i + 1}`,
+          lessonNumber: lessons.length + i + 1,
+          order: lessons.length + i,
+        });
+        created.push(res.data.data);
+      }
+      setLessons((prev) => [...prev, ...created]);
+      setExpandedId(created[0]?.id ?? null);
+    } finally {
+      setBulkCreating(false);
+    }
   };
 
   const deleteLesson = async (id: string) => {
@@ -76,20 +98,46 @@ export const LessonsStep: React.FC<Props> = ({ course }) => {
         <p className="text-sm text-secondary mt-1">Add, reorder, and upload video for each lesson.</p>
       </div>
 
+      {lessons.length === 0 && (
+        <div className="glass-card rounded-2xl p-6 sm:p-7 flex flex-col sm:flex-row sm:items-center gap-5">
+          <div className="w-11 h-11 rounded-2xl bg-white/[0.06] border border-white/10 flex items-center justify-center shrink-0">
+            <Layers className="w-5 h-5 text-primary/70" />
+          </div>
+          <div className="flex-1">
+            <h3 className="text-sm font-bold text-primary mb-0.5">How many episodes does this course have?</h3>
+            <p className="text-xs text-secondary">We'll create empty episode slots for you — just fill in each one after.</p>
+          </div>
+          <div className="flex items-center gap-3 shrink-0">
+            <input
+              type="number"
+              min={1}
+              max={200}
+              value={episodeCount}
+              onChange={(e) => setEpisodeCount(Math.max(1, Number(e.target.value) || 1))}
+              className="admin-input w-20 text-center"
+            />
+            <PrimaryButton onClick={createEpisodes} disabled={bulkCreating}>
+              {bulkCreating ? <Loader2 className="w-4 h-4 mr-1.5 animate-spin" /> : <Plus className="w-4 h-4 mr-1.5" />}
+              Create Episodes
+            </PrimaryButton>
+          </div>
+        </div>
+      )}
+
       <div className="space-y-3">
         {lessons.map((lesson, i) => (
           <div key={lesson.id} className="glass-card rounded-2xl overflow-hidden">
-            <div className="flex items-center gap-3 px-4 py-3">
-              <GripVertical className="w-4 h-4 text-secondary/40 cursor-grab" />
-              <span className="text-xs font-mono text-secondary/60 w-6">{i + 1}</span>
-              <p className="flex-1 text-sm font-semibold text-primary truncate">{lesson.title}</p>
+            <div className="flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-3">
+              <GripVertical className="hidden sm:block w-4 h-4 text-secondary/40 cursor-grab shrink-0" />
+              <span className="text-xs font-mono text-secondary/60 w-5 sm:w-6 shrink-0">{i + 1}</span>
+              <p className="flex-1 text-sm font-semibold text-primary truncate min-w-0">{lesson.title}</p>
               {lesson.bunnyVideoId && (
-                <span className="text-xs text-green-400 font-medium">✓ Video</span>
+                <span className="w-2 h-2 rounded-full bg-green-400 shrink-0" title="Video uploaded" />
               )}
-              <button onClick={() => setExpandedId(expandedId === lesson.id ? null : lesson.id)} className="text-secondary hover:text-primary p-1">
+              <button onClick={() => setExpandedId(expandedId === lesson.id ? null : lesson.id)} className="text-secondary hover:text-primary p-1 shrink-0">
                 {expandedId === lesson.id ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
               </button>
-              <button onClick={() => deleteLesson(lesson.id)} className="text-secondary hover:text-red-400 p-1">
+              <button onClick={() => deleteLesson(lesson.id)} className="text-secondary hover:text-red-400 p-1 shrink-0">
                 <Trash2 className="w-4 h-4" />
               </button>
             </div>

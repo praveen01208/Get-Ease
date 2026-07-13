@@ -80,9 +80,52 @@ export const CourseBuilderWizard: React.FC = () => {
   };
 
   return (
-    <div className="flex gap-8 h-full">
-      {/* Left Sidebar Wizard Navigation */}
-      <div className="w-64 shrink-0">
+    <div className="flex flex-col lg:flex-row gap-5 lg:gap-8 h-full">
+      {/* Mobile: horizontal scrollable step tabs */}
+      <div className="lg:hidden -mx-4 px-4 sm:mx-0 sm:px-0">
+        <div className="flex gap-2 overflow-x-auto pb-1 snap-x">
+          {STEPS.map((step, i) => {
+            const isActive = activeStep === step.id;
+            const isComplete = completedSteps.has(step.id);
+            const canAccess = canAccessStep(step.id);
+            return (
+              <button
+                key={step.id}
+                onClick={() => canAccess && setActiveStep(step.id)}
+                disabled={!canAccess}
+                className={cn(
+                  'shrink-0 snap-start flex items-center gap-2 px-3.5 py-2.5 rounded-full text-xs font-semibold border transition-all whitespace-nowrap',
+                  isActive
+                    ? 'bg-white/10 border-white/20 text-primary'
+                    : 'bg-white/[0.03] border-white/[0.08] text-secondary',
+                  !canAccess && 'opacity-40'
+                )}
+              >
+                <span className={cn(
+                  'w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold shrink-0',
+                  isComplete ? 'bg-green-500/20 text-green-400' : 'bg-white/10 text-secondary'
+                )}>
+                  {isComplete ? <Check className="w-3 h-3" /> : i + 1}
+                </span>
+                {step.label}
+              </button>
+            );
+          })}
+        </div>
+        {course && (
+          <div className={cn(
+            'inline-flex mt-3 px-3 py-1 rounded-lg text-[11px] font-semibold border',
+            course.status === 'PUBLISHED' ? 'bg-green-500/10 text-green-400 border-green-500/20' :
+            course.status === 'ARCHIVED'  ? 'bg-red-500/10 text-red-400 border-red-500/20' :
+            'bg-white/[0.06] text-secondary border-white/[0.08]'
+          )}>
+            {course.status}
+          </div>
+        )}
+      </div>
+
+      {/* Desktop: Left Sidebar Wizard Navigation */}
+      <div className="hidden lg:block w-64 shrink-0">
         <div className="glass-card rounded-2xl p-2 sticky top-0">
           {STEPS.map((step, i) => {
             const isActive = activeStep === step.id;

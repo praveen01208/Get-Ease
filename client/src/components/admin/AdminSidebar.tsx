@@ -16,7 +16,7 @@ const navItems = [
   { to: '/dashboard', icon: ArrowLeftRight, label: 'Student Dashboard' },
 ];
 
-export const AdminSidebar: React.FC = () => {
+export const AdminSidebarContent: React.FC<{ onNavigate?: () => void }> = ({ onNavigate }) => {
   const { logout, user } = useAuthStore();
   const navigate = useNavigate();
 
@@ -26,7 +26,7 @@ export const AdminSidebar: React.FC = () => {
   };
 
   return (
-    <aside className="w-64 shrink-0 flex flex-col h-full border-r border-white/[0.06] bg-[#0d0d0d]">
+    <div className="flex flex-col h-full">
       {/* Brand */}
       <div className="px-6 py-6 border-b border-white/[0.06]">
         <p className="text-xl font-bold text-primary tracking-tight">Get<span className="text-white/40">Ease</span></p>
@@ -40,6 +40,7 @@ export const AdminSidebar: React.FC = () => {
             key={to}
             to={to}
             end={end}
+            onClick={onNavigate}
             className={({ isActive }) => cn(
               'flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-150 group',
               isActive
@@ -73,6 +74,13 @@ export const AdminSidebar: React.FC = () => {
           Sign out
         </button>
       </div>
-    </aside>
+    </div>
   );
 };
+
+// Desktop-only fixed sidebar. Mobile uses a drawer rendered from AdminLayout instead.
+export const AdminSidebar: React.FC = () => (
+  <aside className="hidden lg:flex w-64 shrink-0 flex-col h-full border-r border-white/[0.06] bg-[#0d0d0d]">
+    <AdminSidebarContent />
+  </aside>
+);

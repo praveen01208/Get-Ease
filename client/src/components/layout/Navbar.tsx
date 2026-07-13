@@ -43,21 +43,21 @@ export const Navbar = () => {
         transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
         className={cn(
           "fixed top-0 left-0 right-0 z-50 transition-all duration-300 mx-auto w-full",
-          isScrolled ? "pt-4 px-4 max-w-5xl" : "pt-6 px-6 max-w-7xl"
+          isScrolled ? "pt-3 sm:pt-4 px-3 sm:px-4 max-w-5xl" : "pt-4 sm:pt-6 px-3 sm:px-6 max-w-7xl"
         )}
       >
-        <div 
+        <div
           className={cn(
-            "flex items-center justify-between px-6 transition-all duration-300",
-            isScrolled 
-              ? "h-14 bg-[#151515]/90 backdrop-blur-xl border border-white/[0.08] shadow-[0_16px_48px_rgba(0,0,0,0.3)] rounded-full" 
-              : "h-20 bg-transparent rounded-2xl"
+            "flex items-center justify-between px-4 sm:px-6 transition-all duration-300",
+            isScrolled
+              ? "h-12 sm:h-14 bg-[#151515]/90 backdrop-blur-xl border border-white/[0.08] shadow-[0_16px_48px_rgba(0,0,0,0.3)] rounded-full"
+              : "h-16 sm:h-20 bg-transparent rounded-2xl"
           )}
         >
           {/* Logo */}
-          <Link to={isAuthenticated ? "/dashboard" : "/"} className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-primary rounded-xl flex items-center justify-center">
-              <span className="text-background font-bold text-xl leading-none">G</span>
+          <Link to={isAuthenticated ? "/dashboard" : "/"} className="flex items-center gap-2 shrink-0">
+            <div className="w-7 h-7 sm:w-8 sm:h-8 bg-primary rounded-xl flex items-center justify-center shrink-0">
+              <span className="text-background font-bold text-lg sm:text-xl leading-none">G</span>
             </div>
             <span className={cn(
               "font-bold text-lg tracking-tight text-primary transition-all duration-300",
