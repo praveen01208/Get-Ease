@@ -23,8 +23,22 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 
 app.use(helmet());
+
+// CLIENT_URL may be a single origin or a comma-separated list (e.g. your
+// production domain + a Vercel preview URL). Falls back to local dev.
+const allowedOrigins = (process.env.CLIENT_URL || 'http://localhost:5173')
+  .split(',')
+  .map((o) => o.trim())
+  .filter(Boolean);
+
 app.use(cors({
-  origin: process.env.CLIENT_URL || 'http://localhost:5173',
+  origin: (origin, callback) => {
+    // Allow non-browser requests (no Origin header, e.g. curl/health checks)
+    if (!origin || allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    }
+    callback(new Error(`CORS blocked for origin: ${origin}`));
+  },
   credentials: true
 }));
 app.use(express.json());
