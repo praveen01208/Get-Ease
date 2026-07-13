@@ -186,7 +186,6 @@ export const VideoUploader: React.FC<VideoUploaderProps> = ({ value, onChange, o
                 {meta.fileSize && <span>💾 {formatSize(meta.fileSize)}</span>}
                 <span className="text-green-400">✓ Ready</span>
               </div>
-              <p className="text-[10px] text-secondary/50 mt-1.5 font-mono truncate">ID: {meta.videoId}</p>
             </div>
             <button
               onClick={handleReset}

@@ -105,9 +105,8 @@ export const FileUploader: React.FC<FileUploaderProps> = ({
               <div className="flex gap-3 text-xs text-secondary">
                 <span>{formatSize(result.fileSize)}</span>
                 <span>·</span>
-                <span className="text-green-400">{result.storageProvider}</span>
+                <span className="text-green-400">✓ Saved</span>
               </div>
-              <p className="text-[10px] text-secondary/50 mt-0.5 font-mono truncate">{result.storageKey}</p>
             </div>
             <button onClick={reset} className="text-secondary hover:text-primary p-1">
               <XCircle className="w-4 h-4" />
