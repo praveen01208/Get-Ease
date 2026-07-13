@@ -3,7 +3,7 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
 }
 
 model User {
@@ -79,7 +79,7 @@ model Lesson {
   updatedAt      DateTime         @updatedAt
   course         Course           @relation(fields: [courseId], references: [id], onDelete: Cascade)
   resources      Resource[]
-  uploadJobs     UploadJob[]
+  uploadJobs     UploadJob[]      @relation("LessonUploadJobs")
   lessonProgress LessonProgress[]
   watchProgress  WatchProgress[]
 }
@@ -96,7 +96,7 @@ model Resource {
   fileSize          Int?      @map("file_size")
   lessonId          String
   lesson            Lesson    @relation(fields: [lessonId], references: [id], onDelete: Cascade)
-  uploadJobs        UploadJob[]
+  uploadJobs        UploadJob[] @relation("ResourceUploadJobs")
 }
 
 model UploadJob {
@@ -115,8 +115,8 @@ model UploadJob {
   attempts    Int       @default(0)
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
-  lesson      Lesson?   @relation(fields: [entityId], references: [id])
-  resource    Resource? @relation(fields: [entityId], references: [id])
+  lesson      Lesson?   @relation("LessonUploadJobs", fields: [entityId], references: [id], map: "upload_job_lesson_fkey")
+  resource    Resource? @relation("ResourceUploadJobs", fields: [entityId], references: [id], map: "upload_job_resource_fkey")
 }
 
 model Enrollment {
