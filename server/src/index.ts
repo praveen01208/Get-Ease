@@ -5,6 +5,8 @@ import cookieParser from 'cookie-parser';
 import dotenv from 'dotenv';
 import authRoutes from './routes/auth.routes';
 import studentCoursesRoutes from './routes/student.courses.routes';
+import studentRoutes from './routes/student.routes';
+import { ensureDemoData } from './utils/demoSeed';
 import paymentRoutes from './routes/payment.routes';
 import adminUploadRoutes from './routes/admin/upload.routes';
 import adminCoursesRoutes from './routes/admin/courses.routes';
@@ -37,6 +39,7 @@ app.get('/', (req, res) => {
 app.use('/api/auth', authRoutes);
 app.use('/api/courses', studentCoursesRoutes);
 app.use('/api/payments', requireAuth, paymentRoutes);
+app.use('/api/student', studentRoutes);
 
 // Admin Routes (protected: ADMIN role)
 const adminGuard = [requireAuth, requireRole(['ADMIN'])];
@@ -51,4 +54,7 @@ app.use(errorHandler);
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
+  if (process.env.NODE_ENV !== 'production') {
+    ensureDemoData();
+  }
 });

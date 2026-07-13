@@ -1,10 +1,13 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
+import { useNavigate } from "react-router-dom";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { PrimaryButton, SecondaryButton } from "@/components/ui/Button";
 import { CourseCard } from "@/components/cards/CourseCard";
 import { SearchBar } from "@/components/ui/Input";
+import { studentApi } from "@/lib/studentApi";
+import { formatDuration } from "@/lib/learning";
 
 const FEATURED_COURSES = [
   {
@@ -43,6 +46,35 @@ const FEATURED_COURSES = [
 ];
 
 export const Landing = () => {
+  const navigate = useNavigate();
+  const [featured, setFeatured] = useState<any[]>([]);
+
+  useEffect(() => {
+    // Live courses from the API (demo courses are seeded automatically in dev)
+    studentApi.getCourses()
+      .then(({ data }) => {
+        if (data.success && data.data.length > 0) {
+          setFeatured(
+            data.data.slice(0, 6).map((c: any) => ({
+              id: c.id,
+              slug: c.slug,
+              title: c.title,
+              thumbnail: c.thumbnail || FEATURED_COURSES[0].thumbnail,
+              category: c.category?.name || "Course",
+              instructor: c.instructor?.name || "GetEase Instructor",
+              rating: 4.8,
+              students: c._count?.enrollments || 0,
+              duration: formatDuration(c.totalDuration),
+              price: c.price === 0 ? "Free" : `₹${c.price}`,
+            }))
+          );
+        }
+      })
+      .catch(() => {});
+  }, []);
+
+  const courses = featured.length > 0 ? featured : FEATURED_COURSES;
+
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
@@ -51,15 +83,26 @@ export const Landing = () => {
       <section className="relative h-screen flex items-center justify-center overflow-hidden">
         {/* Video Background */}
         <div className="absolute inset-0 w-full h-full bg-[#09090B]">
+          {/* Desktop video — hidden on mobile */}
           <video
             autoPlay
             muted
             loop
             playsInline
             poster="/images/hero-poster.webp"
-            className="w-full h-full object-cover opacity-[0.55]"
+            className="hidden md:block w-full h-full object-cover opacity-[0.55]"
           >
             <source src="/videos/intro.mp4" type="video/mp4" />
+          </video>
+          {/* Mobile video — visible only on mobile, no audio */}
+          <video
+            autoPlay
+            muted
+            loop
+            playsInline
+            className="block md:hidden w-full h-full object-cover opacity-[0.55]"
+          >
+            <source src="/videos/mobile%20view.mp4" type="video/mp4" />
           </video>
           {/* Subtle gradient overlay to blend seamlessly with background */}
           <div className="absolute inset-0 bg-gradient-to-t from-background via-background/20 to-transparent" />
@@ -85,10 +128,10 @@ export const Landing = () => {
             </div>
 
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-              <PrimaryButton size="lg" className="rounded-full w-full sm:w-auto px-8">
+              <PrimaryButton size="lg" className="rounded-full w-full sm:w-auto px-8" onClick={() => navigate("/dashboard")}>
                 Start Learning
               </PrimaryButton>
-              <SecondaryButton size="lg" className="rounded-full w-full sm:w-auto px-8 bg-white/10 text-white border-white/20 hover:bg-white/20 backdrop-blur-md">
+              <SecondaryButton size="lg" className="rounded-full w-full sm:w-auto px-8 bg-white/10 text-white border-white/20 hover:bg-white/20 backdrop-blur-md" onClick={() => navigate("/courses")}>
                 Explore Courses
               </SecondaryButton>
             </div>
@@ -108,19 +151,20 @@ export const Landing = () => {
                 Hand-picked by our experts to help you reach your goals faster.
               </p>
             </div>
-            <SecondaryButton className="rounded-full shrink-0">
+            <SecondaryButton className="rounded-full shrink-0" onClick={() => navigate("/courses")}>
               View All Courses
             </SecondaryButton>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {FEATURED_COURSES.map((course, index) => (
+            {courses.map((course: any, index: number) => (
               <motion.div
                 key={course.id}
                 initial={{ opacity: 0, y: 15 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: "-100px" }}
                 transition={{ duration: 0.25, delay: index * 0.05 }}
+                onClick={() => course.slug && navigate(`/courses/${course.slug}`)}
               >
                 <CourseCard {...course} />
               </motion.div>

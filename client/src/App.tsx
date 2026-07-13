@@ -16,7 +16,14 @@ import { AdminMediaLibrary } from "@/pages/admin/MediaLibrary";
 import { CourseCatalog } from "@/pages/CourseCatalog";
 import { CourseDetails } from "@/pages/CourseDetails";
 import { CoursePlayer } from "@/pages/CoursePlayer";
-import { StudentDashboard } from "@/pages/StudentDashboard";
+import { StudentLayout } from "@/components/student/StudentLayout";
+import { DashboardHome } from "@/pages/student/DashboardHome";
+import { MyLearning } from "@/pages/student/MyLearning";
+import { WishlistPage } from "@/pages/student/WishlistPage";
+import { CertificatesPage } from "@/pages/student/CertificatesPage";
+import { PurchaseHistory } from "@/pages/student/PurchaseHistory";
+import { ProfilePage } from "@/pages/student/ProfilePage";
+import { SettingsPage } from "@/pages/student/SettingsPage";
 import {
   Pricing, About, Contact, NotFound
 } from "@/pages/Placeholders";
@@ -45,11 +52,9 @@ function App() {
             <Route path="/" element={<Landing />} />
             <Route path="/courses" element={<CourseCatalog />} />
             <Route path="/courses/:slug" element={<CourseDetails />} />
-            <Route path="/courses/:slug/learn" element={
-              <ProtectedRoute>
-                <CoursePlayer />
-              </ProtectedRoute>
-            } />
+            {/* Player is public so anyone can watch a course's free preview
+                lesson; locked lessons redirect to login / purchase in-page */}
+            <Route path="/courses/:slug/learn" element={<CoursePlayer />} />
             <Route path="/pricing" element={<Pricing />} />
             <Route path="/about" element={<About />} />
             <Route path="/contact" element={<Contact />} />
@@ -59,9 +64,17 @@ function App() {
             {/* Student Protected */}
             <Route path="/dashboard" element={
               <ProtectedRoute>
-                <StudentDashboard />
+                <StudentLayout />
               </ProtectedRoute>
-            } />
+            }>
+              <Route index element={<DashboardHome />} />
+              <Route path="my-learning" element={<MyLearning />} />
+              <Route path="wishlist" element={<WishlistPage />} />
+              <Route path="certificates" element={<CertificatesPage />} />
+              <Route path="purchases" element={<PurchaseHistory />} />
+              <Route path="profile" element={<ProfilePage />} />
+              <Route path="settings" element={<SettingsPage />} />
+            </Route>
 
             {/* Admin Protected (ADMIN role required) */}
             <Route path="/admin" element={
