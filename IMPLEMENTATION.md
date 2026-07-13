@@ -59,16 +59,22 @@
 
 ---
 
+## Phase 4: Bunny Stream Integration - **[COMPLETED]**
+- Implemented `BunnyVideoUploadService` (`server/src/services/upload/bunny/BunnyVideoUploadService.ts`): creates the video object via the Bunny Stream API, uploads the buffered file, polls/reads processing status (duration, resolution, progress), and deletes videos. Matches `IVideoUploadService` exactly — no controller/route changes needed.
+- Added `server/src/utils/bunny.ts`: derives playback (`.../playlist.m3u8`) and thumbnail URLs from `BUNNY_CDN_HOSTNAME` + `bunnyVideoId` on read. No playback URL is ever stored — only the Bunny videoId, per spec.
+- `student.courses.controller.ts` (`getCourseBySlug`) now returns `videoUrl`/`thumbnailUrl` per lesson (null when not accessible), so the frontend never needs its own Bunny configuration.
+- `CoursePlayer.tsx` now plays `currentLesson.videoUrl` instead of the placeholder stream, with the thumbnail as poster.
+- To activate: set `UPLOAD_PROVIDER=bunny` and fill in `BUNNY_API_KEY` in `server/.env` (library ID and CDN hostname are already set from the project spec).
+- Note: the native `<video>` tag plays HLS (`.m3u8`) directly, which works in Safari out of the box; Chrome/Firefox will need an `hls.js` wiring pass later for full cross-browser support.
+
+## Phase 5: Cloudflare R2 - **[COMPLETED]**
+- Implemented `R2StorageService` (`server/src/services/upload/r2/R2StorageService.ts`) using `@aws-sdk/client-s3` + `@aws-sdk/s3-request-presigner` (R2 is S3-compatible). Uploads to a UUID-prefixed key, generates a 7-day presigned URL, and supports delete/regenerate-URL. Matches `IStorageService` exactly.
+- Added `@aws-sdk/client-s3` and `@aws-sdk/s3-request-presigner` to `server/package.json` — **run `npm install` in `server/` before starting the backend.**
+- To activate: set `STORAGE_PROVIDER=r2` and fill in `R2_ACCOUNT_ID`, `R2_ACCESS_KEY`, `R2_SECRET_KEY`, `R2_BUCKET_NAME` in `server/.env`.
+
+---
+
 ## Future Phases
-
-- Course Builder
-- Media Library
-
-### Phase 4: Bunny Stream Integration
-- Video upload & streaming architecture
-
-### Phase 5: Cloudflare R2
-- Storage for PDFs, thumbnails, and assignments
 
 ### Phase 6: Razorpay
 - Payment gateway integration

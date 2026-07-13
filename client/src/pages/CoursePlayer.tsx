@@ -241,10 +241,12 @@ export const CoursePlayer = () => {
         {/* Main area */}
         <div className="flex-1 flex flex-col overflow-y-auto">
           <div className="w-full bg-black aspect-video relative flex items-center justify-center shrink-0">
-            {currentLesson?.bunnyVideoId ? (
+            {currentLesson?.videoUrl ? (
               <video
                 ref={videoRef}
-                src={`https://demo.unified-streaming.com/k8s/features/stable/video/tears-of-steel/tears-of-steel.ism/.m3u8`} // Placeholder stream until Bunny integration (Phase 4)
+                key={currentLesson.id}
+                src={currentLesson.videoUrl}
+                poster={currentLesson.thumbnailUrl || undefined}
                 controls
                 autoPlay
                 className="w-full h-full"

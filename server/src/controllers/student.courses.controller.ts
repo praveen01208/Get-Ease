@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import { prisma } from '../utils/prisma';
 import { AuthRequest } from '../middlewares/auth.middleware';
+import { getBunnyVideoUrl, getBunnyThumbnailUrl } from '../utils/bunny';
 
 export const getCourses = async (req: Request, res: Response) => {
   try {
@@ -98,10 +99,13 @@ export const getCourseBySlug = async (req: AuthRequest, res: Response) => {
     const sanitizedLessons = course.lessons.map(lesson => {
       const isFree = lesson.isFree || lesson.id === previewFallbackId;
       const canAccess = isEnrolled || isFree;
+      const videoId = canAccess ? lesson.bunnyVideoId : null;
       return {
         ...lesson,
         isFree,
-        bunnyVideoId: canAccess ? lesson.bunnyVideoId : null,
+        bunnyVideoId: videoId,
+        videoUrl: getBunnyVideoUrl(videoId),
+        thumbnailUrl: getBunnyThumbnailUrl(videoId),
         resources: canAccess ? lesson.resources : [],
         isAccessible: canAccess
       };
