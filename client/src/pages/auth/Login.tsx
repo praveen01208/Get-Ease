@@ -27,13 +27,13 @@ export const Login = () => {
     try {
       const { data } = await api.post('/auth/login', { email, password });
       setAuth(data.user, data.accessToken);
-      // Redirect: go back to where they came from, or role-based default
-      if (from) {
-        navigate(from, { replace: true });
-      } else if (data.user.role === 'ADMIN') {
-        navigate('/admin', { replace: true });
+      // Redirect: admins always land in the admin panel unless they were
+      // specifically headed to an /admin route already. Everyone else goes
+      // back to where they came from, or their dashboard by default.
+      if (data.user.role === 'ADMIN') {
+        navigate(from && from.startsWith('/admin') ? from : '/admin', { replace: true });
       } else {
-        navigate('/dashboard', { replace: true });
+        navigate(from || '/dashboard', { replace: true });
       }
     } catch (err: any) {
       setError(err.response?.data?.message || 'Failed to login. Please try again.');
